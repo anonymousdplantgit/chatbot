@@ -1,0 +1,76 @@
+server:
+  port: 8081
+  compression:
+    enabled: true  # Enable response compression for better performance
+  http2:
+    enabled: true  # Enable HTTP/2 for better request handling
+logging:
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: chatbot.log  # Log to file for better debugging
+  level:
+    javax:
+      mail: DEBUG
+    com:
+      sun:
+        mail: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+        mail: DEBUG
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterAccess=600s
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${app.datasource.host}:${app.datasource.port}/${app.datasource.database}
+    username: ${app.datasource.username}
+    password: ${app.datasource.password}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop  # Options: none, update, create, create-drop
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 100
+        jdbc:
+          lob:
+            non_contextual_creation: true
+app:
+  chatbot:
+    memoryTokenLimit: 4096
+    confidence-threshold: 0.5
+    system-prompt: classpath:system-colang-prompt.co
+  directories:
+    temp: tmp
+  datasource:
+    host: localhost
+    port: 5432
+    database: chatbot
+    username: postgres
+    password: postgres
+    embeddings-table: embeddings
+# LangChain4j configuration
+lang-chain4j:
+  ollama:
+    chat-model:
+      base-url: http://localhost:11434
+      model-name: llama3.2:latest
+      temperature: 0.1
+      timeout: 60
+    embedding-model:
+      base-url: http://localhost:11434
+      model-name: nomic-embed-text
+      timeout: 60
